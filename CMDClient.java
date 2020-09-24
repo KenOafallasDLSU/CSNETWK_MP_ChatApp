@@ -72,8 +72,7 @@ public class CMDClient
                             }
                             
                         } catch (Exception e) { 
-    
-                            e.printStackTrace(); 
+                            //e.printStackTrace(); 
                         } 
                     } 
                 } 
@@ -103,7 +102,7 @@ public class CMDClient
             dos.close();
             s.close();
         } catch (Exception e) { 
-            e.printStackTrace(); 
+            //e.printStackTrace(); 
         } 
 
         

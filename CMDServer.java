@@ -14,6 +14,7 @@ public class CMDServer
     static CMDClientHandler chA = new CMDClientHandler();
     static CMDClientHandler chB = new CMDClientHandler();
     static boolean userExists = true;
+    static Object synchronizer = new Object();
 
     public static void main(String[] args) 
     {
@@ -42,8 +43,11 @@ public class CMDServer
 
                             Thread tA = new Thread(chA);
                             tA.start();
+                            tA.join();
+                            System.out.println("listenerA does 1 listen loop");
                         }
-                    }while(CMDServer.chA.isLoggedIn || CMDServer.chB.isLoggedIn);
+                    }while(CMDServer.userExists);
+                    System.out.println("A went out of loop");
                     
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -69,36 +73,42 @@ public class CMDServer
 
                             Thread tB = new Thread(chB);
                             tB.start();
+                            tB.join();
+                            System.out.println("listenerA does 1 listen loop");
                         }
-                    }while(CMDServer.chA.isLoggedIn || CMDServer.chB.isLoggedIn);
+                    }while(CMDServer.userExists);
+                    System.out.println("B went out of loop");
                     
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             });
 
-            boolean inSession = false;
-            do
+            try {
+                listenerA.start();
+                listenerB.start();
+    
+                //listenerA.join();
+                //listenerB.join();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            System.out.println("Before loop: " + CMDServer.userExists);
+            synchronized(CMDServer.synchronizer)
             {
-                if(!inSession){
-                    inSession = true;
+                CMDServer.synchronizer.wait();
+            }
+            System.out.println("After loop: " + CMDServer.userExists);
 
-                    try {
-                        listenerA.start();
-                        listenerB.start();
-            
-                        // listenerA.join();
-                        // listenerB.join();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                }
-                
-                //System.out.println(CMDServer.userExists);
-            } while(CMDServer.userExists);
             listenerA.interrupt();
+            listenerA.join(1000);
+            System.out.println("A interrupted");
+
             listenerB.interrupt();
+            listenerB.join(1000);
+            System.out.println("B interrupted");
+            
 
 		} catch (Exception e) {
 
@@ -108,6 +118,7 @@ public class CMDServer
 
             CMDServer.jeeves.addLog("Server: Connection is terminated.\r\n");
             CMDServer.jeeves.promptLogs();
+            System.exit(0);
 
 		}
   }
@@ -178,30 +189,51 @@ class CMDClientHandler implements Runnable
     public void run()
     {
         String received;
-        while(isLoggedIn == true)
+        while(this.isLoggedIn == true)
         {
             try{
+                System.out.println("In CMDHandler run for A: " + this.isUserA );
+
                 received = dis.readUTF();
-                if(received == "END")
+                if(received.equals("END"))
                 {
-                    this.isLoggedIn=false; 
-                    this.s.close(); 
+                    this.logOut();
                 }
                 else
                 {
                     if(this.isUserA)
                     {
-                        if(CMDServer.chB.isLoggedIn)
-                            CMDServer.chB.dos.writeUTF(received);
+                        if(!CMDServer.chB.isLoggedIn)
+                            this.dos.writeUTF("Server: The other user is disconnected");
+                            
                         else
-                            this.dos.writeUTF("Server: The other user has disconnected");
+                        {
+                            if(received.equals("FILE"))
+                            {
+                                this.relayFile();
+                            }else{
+                                this.relayText(CMDServer.chB.dos, received);
+                            }
+                        }
+                        
+                            
                     }
                     else
                     {
-                        if(CMDServer.chA.isLoggedIn)
-                            CMDServer.chA.dos.writeUTF(received);
+                        if(!CMDServer.chA.isLoggedIn)
+                            this.dos.writeUTF("Server: The other user is disconnected");
                         else
-                            this.dos.writeUTF("Server: The other user has disconnected");
+                        {
+                            if(received.equals("FILE"))
+                            {
+                                this.relayFile();
+                            }else{
+                                this.relayText(CMDServer.chA.dos, received);
+                            }
+                        }
+                        
+                        
+                            
                     }
                 }
 
@@ -210,13 +242,40 @@ class CMDClientHandler implements Runnable
                 //e.printStackTrace(); 
                 this.isLoggedIn = false;
                 if(!CMDServer.chA.isLoggedIn && !CMDServer.chB.isLoggedIn)
+                {
                     CMDServer.userExists = false;
+                    synchronized(CMDServer.synchronizer)
+                    {
+                        CMDServer.synchronizer.notify();
+                    }
+                }
+                System.out.println("Users Exist: " + CMDServer.userExists + " for User A: " + this.isUserA + " at catch");
+
                 CMDServer.jeeves.addLog("Server: Client at " + this.s.getRemoteSocketAddress() + " is connected: " + this.isLoggedIn + " :<\r\n");
 
             } finally{
 
+                if(!CMDServer.chA.isLoggedIn && !CMDServer.chB.isLoggedIn)
+                {
+                    CMDServer.userExists = false;
+                    synchronized(CMDServer.synchronizer)
+                    {
+                        CMDServer.synchronizer.notify();
+                    }
+                }
+                if(CMDServer.userExists == false)
+                {
+                    System.out.println("Conditional break for User A: " + this.isUserA);
+                    break;
+                }
+                    
+                System.out.println("Users Exist: " + CMDServer.userExists + " for User A: " + this.isUserA);
+
             }
         }
+
+        System.out.println("READ LOOP BROKEN for User A: " + this.isUserA);
+
 
         try{
 
@@ -227,6 +286,36 @@ class CMDClientHandler implements Runnable
 
             e.printStackTrace(); 
 
+        }
+
+        System.out.println("THREAD DONE for User A: " + this.isUserA);
+        
+    }
+
+    void relayText(DataOutputStream dos, String received)
+    {
+        try{
+            dos.writeUTF(received);
+        } catch(Exception e){
+            
+        }
+        
+    }
+
+    void relayFile()
+    {
+        ;
+    }
+
+    void logOut()
+    {
+        try{
+            this.isLoggedIn=false; 
+            this.s.close(); 
+            if(!CMDServer.chA.isLoggedIn && !CMDServer.chB.isLoggedIn)
+                    CMDServer.userExists = false;
+        } catch(Exception e){
+            
         }
         
     }
