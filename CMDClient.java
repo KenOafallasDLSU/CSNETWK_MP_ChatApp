@@ -85,9 +85,10 @@ public class CMDClient
             readMessage.join(); 
 
         } catch(Exception e){
-            e.printStackTrace();
+            //e.printStackTrace();
+            System.out.println("Failed to connect to server. Please check if server is online.");
         } finally{
-            System.out.println(name + ": Connection is terminated.");
+            //System.out.println(name + ": Connection is terminated.");
         }
     } 
 
@@ -96,7 +97,7 @@ public class CMDClient
         System.out.println("You logged out");
 
         try { 
-            dos.writeUTF(name + " logged out. Goodbye!"); 
+            dos.writeUTF(name + " HAS LOGGED OUT"); 
 
             dis.close();
             dos.close();
@@ -176,6 +177,7 @@ public class CMDClient
 
     static void receiveText(String msg)
     {
-        System.out.println(msg); 
+        if(!msg.equals(""))
+            System.out.println(msg); 
     }
 } 

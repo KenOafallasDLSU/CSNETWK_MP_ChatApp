@@ -10,7 +10,9 @@ import java.io.*;
 
 public class CMDServer
 {
-    static ServerButler jeeves;
+    static Logger loggerServer;
+    static Logger loggerA;
+    static Logger loggerB;
     static CMDClientHandler chA = new CMDClientHandler();
     static CMDClientHandler chB = new CMDClientHandler();
     static boolean userExists = true;
@@ -23,7 +25,9 @@ public class CMDServer
 		try 
 		{   
             ServerSocket serverSocket = new ServerSocket(nPort);
-            jeeves = new ServerButler();
+            CMDServer.loggerServer = new Logger("log.txt");
+            CMDServer.loggerA = new Logger("logA.txt");
+            CMDServer.loggerB = new Logger("logB.txt");
 
             Thread listenerA = new Thread(() -> {
                 try {
@@ -31,17 +35,20 @@ public class CMDServer
                         //System.out.println("A is " + CMDServer.chA.isLoggedIn);
                         if(!CMDServer.chA.isLoggedIn)
                         { 
-                            CMDServer.jeeves.addLog("Server: Listening on port " + nPort + " for User A\n");
+                            CMDServer.loggerServer.addLog("Server: Listening on port " + nPort + " for User A");
                             Socket userA = new Socket();
                             userA = serverSocket.accept();
-                            CMDServer.jeeves.addLog("Server: Client A at " + userA.getRemoteSocketAddress() + " has connected\r\n");
+                            CMDServer.loggerServer.addLog("Server: Client A at " + userA.getRemoteSocketAddress() + " has connected");
 
                             DataInputStream disA = new DataInputStream(userA.getInputStream()); 
                             DataOutputStream dosA = new DataOutputStream(userA.getOutputStream());
 
-                            chA = new CMDClientHandler(userA, disA, dosA, true);
+                            CMDServer.chA = new CMDClientHandler(userA, disA, dosA, true);
 
-                            Thread tA = new Thread(chA);
+                            //reprint chat history if exists
+                            CMDServer.chA.dos.writeUTF(CMDServer.loggerA.toString());
+
+                            Thread tA = new Thread(CMDServer.chA);
                             tA.start();
                             tA.join();
                             System.out.println("listenerA does 1 listen loop");
@@ -61,17 +68,20 @@ public class CMDServer
                         if (!CMDServer.chB.isLoggedIn)
                         {
 
-                            CMDServer.jeeves.addLog("Server: Listening on port " + nPort + " for User B\n");
+                            CMDServer.loggerServer.addLog("Server: Listening on port " + nPort + " for User B");
                             Socket userB = new Socket();
                             userB = serverSocket.accept();
-                            CMDServer.jeeves.addLog("Server: Client B at " + userB.getRemoteSocketAddress() + " has connected\r\n");
+                            CMDServer.loggerServer.addLog("Server: Client B at " + userB.getRemoteSocketAddress() + " has connected");
 
                             DataInputStream disB = new DataInputStream(userB.getInputStream()); 
                             DataOutputStream dosB = new DataOutputStream(userB.getOutputStream());
 
-                            chB = new CMDClientHandler(userB, disB, dosB, false);
+                            CMDServer.chB = new CMDClientHandler(userB, disB, dosB, false);
 
-                            Thread tB = new Thread(chB);
+                            //reprint chat history if exists
+                            CMDServer.chB.dos.writeUTF(CMDServer.loggerB.toString());
+
+                            Thread tB = new Thread(CMDServer.chB);
                             tB.start();
                             tB.join();
                             System.out.println("listenerA does 1 listen loop");
@@ -94,20 +104,20 @@ public class CMDServer
                 e.printStackTrace();
             }
 
-            System.out.println("Before loop: " + CMDServer.userExists);
+            //System.out.println("Before loop: " + CMDServer.userExists);
             synchronized(CMDServer.synchronizer)
             {
                 CMDServer.synchronizer.wait();
             }
-            System.out.println("After loop: " + CMDServer.userExists);
+            //System.out.println("After loop: " + CMDServer.userExists);
 
             listenerA.interrupt();
             listenerA.join(1000);
-            System.out.println("A interrupted");
+            //System.out.println("A interrupted");
 
             listenerB.interrupt();
             listenerB.join(1000);
-            System.out.println("B interrupted");
+            //System.out.println("B interrupted");
             
 
 		} catch (Exception e) {
@@ -116,49 +126,13 @@ public class CMDServer
             
 		} finally {
 
-            CMDServer.jeeves.addLog("Server: Connection is terminated.\r\n");
-            CMDServer.jeeves.promptLogs();
+            CMDServer.loggerServer.addLog("Server: Both users have disconnected.");
+            CMDServer.loggerServer.addLog("Server: Connection is terminated.");
+            CMDServer.loggerServer.promptLogs();
             System.exit(0);
 
 		}
   }
-}
-
-class ServerButler
-{
-    StringBuilder log;
-
-    ServerButler()
-    {
-        this.log = new StringBuilder("This is the log.\r\n");
-    }
-
-    void promptLogs()
-    {
-        System.out.println("Print the logz?? [Y]es [N]o");
-        if(true)
-        {
-            try{
-                System.out.println("What:" + this.log.toString());
-
-                File logFile = new File("log.txt");
-                logFile.createNewFile();
-
-                FileWriter logWriter = new FileWriter("log.txt");
-                logWriter.write(this.log.toString());
-                logWriter.close();
-            }catch(Exception e){
-                e.printStackTrace();
-            }
-            
-        }
-    }
-
-    void addLog(String s)
-    {
-        System.out.println(s);
-        this.log.append(s);
-    }
 }
 
 class CMDClientHandler implements Runnable
@@ -189,28 +163,45 @@ class CMDClientHandler implements Runnable
     public void run()
     {
         String received;
+        String[] tokens;
+
         while(this.isLoggedIn == true)
         {
             try{
                 System.out.println("In CMDHandler run for A: " + this.isUserA );
 
                 received = dis.readUTF();
-                if(received.equals("END"))
-                {
-                    this.logOut();
+                tokens = received.split(": ", 2);
+                CMDServer.loggerServer.addLog(received);
+                if(this.isUserA)
+                {   
+                    CMDServer.loggerB.addHistory(received);
+                    CMDServer.loggerA.addHistory(tokens[1]);
+                } else{
+                    CMDServer.loggerA.addHistory(received);
+                    CMDServer.loggerB.addHistory(tokens[1]);
                 }
-                else
-                {
+                    
+
+                // if(received.equals("END"))
+                // {
+                //     this.logOut();
+                // }
+                //else
+                //{
+                    System.out.println(received);
                     if(this.isUserA)
                     {
                         if(!CMDServer.chB.isLoggedIn)
                             this.dos.writeUTF("Server: The other user is disconnected");
-                            
                         else
                         {
                             if(received.equals("FILE"))
                             {
                                 this.relayFile();
+                            }else if(received.equals("END")){
+                                this.relayText(CMDServer.chB.dos, received);
+                                this.logOut();
                             }else{
                                 this.relayText(CMDServer.chB.dos, received);
                             }
@@ -227,15 +218,15 @@ class CMDClientHandler implements Runnable
                             if(received.equals("FILE"))
                             {
                                 this.relayFile();
+                            }else if(received.equals("END")){
+                                this.relayText(CMDServer.chA.dos, received);
+                                this.logOut();
                             }else{
                                 this.relayText(CMDServer.chA.dos, received);
                             }
                         }
-                        
-                        
-                            
                     }
-                }
+                //}
 
             } catch(Exception e){
 
@@ -251,7 +242,7 @@ class CMDClientHandler implements Runnable
                 }
                 System.out.println("Users Exist: " + CMDServer.userExists + " for User A: " + this.isUserA + " at catch");
 
-                CMDServer.jeeves.addLog("Server: Client at " + this.s.getRemoteSocketAddress() + " is connected: " + this.isLoggedIn + " :<\r\n");
+                CMDServer.loggerServer.addLog("Server: Client at " + this.s.getRemoteSocketAddress() + " has disconnected.");
 
             } finally{
 
