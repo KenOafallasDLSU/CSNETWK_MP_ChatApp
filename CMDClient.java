@@ -34,11 +34,14 @@ public class CMDClient
                     while (CMDClient.isLoggedIn) { 
                         try{
                             // read the message to deliver. 
+                            //while(!scn.hasNextLine());
+                            System.out.println("has line: " + scn.hasNextLine());
+                            
                             String msg = scn.nextLine(); 
                             
                             if(msg.equals("FILE"))
                             {
-                                CMDClient.sendFile(scn, dos);
+                                CMDClient.sendFile(name, scn, dos);
                             } else if(msg.equals("END")) {
                                 CMDClient.logout(name, s, dis, dos);
                                 CMDClient.isLoggedIn = false;
@@ -47,7 +50,7 @@ public class CMDClient
                             }
                         } catch(Exception e)
                         {
-                            e.printStackTrace();
+                            //e.printStackTrace();
                         }
                         
                     } 
@@ -59,12 +62,14 @@ public class CMDClient
             { 
                 @Override
                 public void run() { 
-    
+                String[] tokens;
+
                     while (CMDClient.isLoggedIn) { 
                         try { 
                             // read the message sent to this client 
                             String msg = dis.readUTF(); 
-                            if(msg.equals("FILE"))
+                            tokens = msg.split(": ", 2);
+                            if(tokens[1].equals("FILE"))
                             {
                                 CMDClient.receiveFile(scn, dis);
                             } else{
@@ -97,7 +102,7 @@ public class CMDClient
         System.out.println("You logged out");
 
         try { 
-            dos.writeUTF(name + " HAS LOGGED OUT"); 
+            dos.writeUTF(name + ": LOGGED OUT (SYSTEM MESSAGE)"); 
 
             dis.close();
             dos.close();
@@ -109,16 +114,16 @@ public class CMDClient
         
     }
 
-    static void sendFile(Scanner scn, DataOutputStream dos)
+    static void sendFile(String name, Scanner scn, DataOutputStream dos)
     {
         try { 
-            dos.writeUTF("FILE"); 
+            dos.writeUTF(name +": FILE"); 
 
-            System.out.print("Enter filename: ");
-            String fileName = scn.nextLine(); 
+            //System.out.print("Enter filepath: ");
+            //String fileName = scn.nextLine(); 
+            String fileName = "sendThis.jpg";
 
-            dos.writeUTF(fileName); 
-
+            //read file
             File file = new File(fileName);
             byte[] byteArray = new byte [(int)file.length()];
 			
@@ -127,6 +132,7 @@ public class CMDClient
             bis.read(byteArray,0,byteArray.length);
 			DataInputStream disReader = new DataInputStream(bis);
 
+            //send file
             System.out.println("Sending file " + "\"" + fileName + "\" " + "(" + byteArray.length + " bytes)\n" );  
             dos.write(byteArray,0,byteArray.length);
             dos.flush();
@@ -150,13 +156,15 @@ public class CMDClient
     {
         System.out.println("RECEIVE FILE");
         try{
-            String fileName = dis.readUTF(); 
+            //String fileName = dis.readUTF(); 
 
-            System.out.println("Receiving file: " + fileName);
+            System.out.println("Receiving file");
 
-            System.out.print("Enter filename: ");
-            fileName = scn.nextLine();
+            // System.out.print("Enter filename: ");
+            // String fileName = scn.nextLine();
             //scn.nextLine();
+
+            String fileName = "gotcha.jpg";
 
             int filesize = 1048576;
             byte[] byteArray = new byte[filesize];
@@ -164,6 +172,8 @@ public class CMDClient
             FileOutputStream fos = new FileOutputStream(fileName);
             BufferedOutputStream bos = new BufferedOutputStream(fos);
             int bytesRead = dis.read(byteArray,0,byteArray.length);
+
+            System.out.println("received bytes: " + bytesRead);
     
             bos.write(byteArray, 0 , bytesRead);
             bos.flush();

@@ -177,10 +177,16 @@ class CMDClientHandler implements Runnable
                 {   
                     CMDServer.loggerB.addHistory(received);
                     CMDServer.loggerA.addHistory(tokens[1]);
+                    
                 } else{
                     CMDServer.loggerA.addHistory(received);
-                    CMDServer.loggerB.addHistory(tokens[1]);
+                    CMDServer.loggerB.addHistory(tokens[1]); 
+                    // if(received.equals("END") || received.equals("FILE"))
+                    //     CMDServer.loggerB.addHistory(received);
+                    // else
                 }
+                
+                
                     
 
                 // if(received.equals("END"))
@@ -196,10 +202,11 @@ class CMDClientHandler implements Runnable
                             this.dos.writeUTF("Server: The other user is disconnected");
                         else
                         {
-                            if(received.equals("FILE"))
+                            if(tokens[1].equals("FILE"))
                             {
-                                this.relayFile();
-                            }else if(received.equals("END")){
+                                this.relayText(CMDServer.chB.dos, received);
+                                this.relayFile(this.dis, CMDServer.chB.dos);
+                            }else if(tokens[1].equals("LOGGED OUT (SYSTEM MESSAGE)")){
                                 this.relayText(CMDServer.chB.dos, received);
                                 this.logOut();
                             }else{
@@ -215,10 +222,11 @@ class CMDClientHandler implements Runnable
                             this.dos.writeUTF("Server: The other user is disconnected");
                         else
                         {
-                            if(received.equals("FILE"))
+                            if(tokens[1].equals("FILE"))
                             {
-                                this.relayFile();
-                            }else if(received.equals("END")){
+                                this.relayText(CMDServer.chA.dos, received);
+                                this.relayFile(this.dis, CMDServer.chA.dos);
+                            }else if(tokens[1].equals("LOGGED OUT (SYSTEM MESSAGE)")){
                                 this.relayText(CMDServer.chA.dos, received);
                                 this.logOut();
                             }else{
@@ -230,7 +238,7 @@ class CMDClientHandler implements Runnable
 
             } catch(Exception e){
 
-                //e.printStackTrace(); 
+                e.printStackTrace(); 
                 this.isLoggedIn = false;
                 if(!CMDServer.chA.isLoggedIn && !CMDServer.chB.isLoggedIn)
                 {
@@ -242,6 +250,7 @@ class CMDClientHandler implements Runnable
                 }
                 System.out.println("Users Exist: " + CMDServer.userExists + " for User A: " + this.isUserA + " at catch");
 
+                //for other exception
                 CMDServer.loggerServer.addLog("Server: Client at " + this.s.getRemoteSocketAddress() + " has disconnected.");
 
             } finally{
@@ -293,9 +302,46 @@ class CMDClientHandler implements Runnable
         
     }
 
-    void relayFile()
+    void relayFile(DataInputStream dis, DataOutputStream dos)
     {
-        ;
+        try{
+
+            System.out.println("Getting file from sender...");
+
+            //get the input file
+            int filesize = 1048576;
+            byte[] byteArrayR = new byte[filesize];
+                    
+            //String fileName = "ServerGet.txt";
+            String fileName = "ServerGet.jpg";
+            FileOutputStream fos = new FileOutputStream(fileName);
+            
+            BufferedOutputStream bos = new BufferedOutputStream(fos);
+            //DataInputStream disReader = new DataInputStream(clientEndpoint.getInputStream());
+            int bytesRead = dis.read(byteArrayR,0,byteArrayR.length);
+            
+            bos.write(byteArrayR, 0 , bytesRead);
+            bos.flush();
+            bos.close();
+    
+            //relay to the other user
+            byte[] byteArrayS = new byte [bytesRead];
+                    
+            //FileInputStream fis = new FileInputStream(file);
+            //BufferedInputStream bis = new BufferedInputStream(fis);
+            //bis.read(byteArray,0,byteArray.length);
+            //DataInputStream disReader = new DataInputStream(bis);
+            System.out.println("Server: relaying bytes: " + bytesRead);        
+            //sending file
+            //DataOutputStream dosWriter = new DataOutputStream(serverEndpoint.getOutputStream());
+            //System.out.println("Server: Sending file " + "\"" + fileName + "\" " + "(" + byteArray.length + " bytes)\n" );  
+            dos.write(byteArrayS, 0 , bytesRead);
+            dos.flush();
+
+        } catch(Exception e){
+            e.printStackTrace();
+            System.out.println("Server: Failed sending file");
+        }
     }
 
     void logOut()
