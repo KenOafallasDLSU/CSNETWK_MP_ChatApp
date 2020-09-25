@@ -10,11 +10,13 @@ public class Model {
     private BlockingQueue<Message> queue;
     private int port;
     // private String path;
+    private String IPaddress;
 
     public Model(BlockingQueue<Message> q)
     {
         this.queue = q;
         this.client = null;
+        this.IPaddress = "localhost";
     }
 
     public String getUsername() {
@@ -46,7 +48,7 @@ public class Model {
     }
 
     public void activateClient(){
-        this.client = new Client(this.username, this.port, this.queue);
+        this.client = new Client(this.IPaddress, this.username, this.port, this.queue);
     }
 
     public void setConversation(String oldText, String newText) {

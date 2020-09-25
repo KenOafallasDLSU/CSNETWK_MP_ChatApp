@@ -12,7 +12,7 @@ import java.util.concurrent.BlockingQueue;
 public class Client  
 { 
     private boolean isLoggedIn;
-    
+    final String IPaddress;
     final String name;
     final int port;
     private Socket s;
@@ -20,8 +20,9 @@ public class Client
     private DataOutputStream dos;
     private BlockingQueue<Message> queue;
 
-    public Client(String name, int port, BlockingQueue<Message> q)
+    public Client(String IPaddress, String name, int port, BlockingQueue<Message> q)
     {
+        this.IPaddress = IPaddress;
         this.name = name;
         this.port = port;
         this.queue = q;
@@ -31,7 +32,7 @@ public class Client
         this.dis = null;
 
         try{
-            this.s = new Socket("localhost", port); 
+            this.s = new Socket(IPaddress, port); 
             this.dis = new DataInputStream(s.getInputStream()); 
             this.dos = new DataOutputStream(s.getOutputStream()); 
 

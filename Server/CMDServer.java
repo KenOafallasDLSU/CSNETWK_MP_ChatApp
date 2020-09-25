@@ -36,10 +36,10 @@ public class CMDServer
                         //System.out.println("A is " + CMDServer.chA.isLoggedIn);
                         if(!CMDServer.chA.isLoggedIn)
                         { 
-                            CMDServer.loggerServer.addLog("Server: Listening on port " + nPort + " for User A");
+                            CMDServer.loggerServer.addLog("Server: Listening on port " + nPort + " at IPAddress " + serverSocket.getInetAddress() + " for User A");
                             Socket userA = new Socket();
                             userA = serverSocket.accept();
-                            CMDServer.loggerServer.addLog("Server: Client A at " + userA.getRemoteSocketAddress() + " has connected");
+                            CMDServer.loggerServer.addLog("Server: Client A at " + userA.getRemoteSocketAddress() + " has connected and logged in");
 
                             DataInputStream disA = new DataInputStream(userA.getInputStream()); 
                             DataOutputStream dosA = new DataOutputStream(userA.getOutputStream());
@@ -52,13 +52,13 @@ public class CMDServer
                             Thread tA = new Thread(CMDServer.chA);
                             tA.start();
                             tA.join();
-                            System.out.println("listenerA does 1 listen loop");
+                            //System.out.println("listenerA does 1 listen loop");
                         }
                     }while(CMDServer.userExists);
-                    System.out.println("A went out of loop");
+                    //System.out.println("A went out of loop");
                     
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    //e.printStackTrace();
                 }
             });
 
@@ -69,10 +69,10 @@ public class CMDServer
                         if (!CMDServer.chB.isLoggedIn)
                         {
 
-                            CMDServer.loggerServer.addLog("Server: Listening on port " + nPort + " for User B");
+                            CMDServer.loggerServer.addLog("Server: Listening on port " + nPort + " at IPAddress " + serverSocket.getInetAddress() + " for User B");
                             Socket userB = new Socket();
                             userB = serverSocket.accept();
-                            CMDServer.loggerServer.addLog("Server: Client B at " + userB.getRemoteSocketAddress() + " has connected");
+                            CMDServer.loggerServer.addLog("Server: Client B at " + userB.getRemoteSocketAddress() + " has connected and logged in");
 
                             DataInputStream disB = new DataInputStream(userB.getInputStream()); 
                             DataOutputStream dosB = new DataOutputStream(userB.getOutputStream());
@@ -85,10 +85,10 @@ public class CMDServer
                             Thread tB = new Thread(CMDServer.chB);
                             tB.start();
                             tB.join();
-                            System.out.println("listenerA does 1 listen loop");
+                            //System.out.println("listenerA does 1 listen loop");
                         }
                     }while(CMDServer.userExists);
-                    System.out.println("B went out of loop");
+                    //System.out.println("B went out of loop");
                     
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -169,37 +169,15 @@ class CMDClientHandler implements Runnable
         while(this.isLoggedIn == true)
         {
             try{
-                System.out.println("In CMDHandler run for A: " + this.isUserA );
+                //System.out.println("In CMDHandler run for A: " + this.isUserA );
 
                 received = dis.readUTF();
                 tokens = received.split(": ", 2);
-                CMDServer.loggerServer.addLog(received);
-                /*
-                if(this.isUserA)
-                {   
-                    CMDServer.loggerB.addHistory(received);
-                    CMDServer.loggerA.addHistory(tokens[1]);
-                    
-                } else{
-                    CMDServer.loggerA.addHistory(received);
-                    CMDServer.loggerB.addHistory(tokens[1]); 
-                    // if(received.equals("END") || received.equals("FILE"))
-                    //     CMDServer.loggerB.addHistory(received);
-                    // else
-                }
-                */
+
                 CMDServer.loggerB.addHistory(received);
                 CMDServer.loggerA.addHistory(received);
                 
-                    
-
-                // if(received.equals("END"))
-                // {
-                //     this.logOut();
-                // }
-                //else
-                //{
-                    System.out.println(received);
+                    //System.out.println(received);
                     if(this.isUserA)
                     {
                         if(!CMDServer.chB.isLoggedIn)
@@ -208,13 +186,16 @@ class CMDClientHandler implements Runnable
                         {
                             if(tokens[1].equals("FILE"))
                             {
-                                //this.relayText(CMDServer.chB.dos, received);
+                                this.relayText(CMDServer.chB.dos, received);
+                                CMDServer.loggerServer.addLog("Server: Client at " + this.s.getRemoteSocketAddress() + " sending file to Client at " + CMDServer.chB.s.getRemoteSocketAddress());
+                                CMDServer.loggerServer.addLog("Server: Client at " + CMDServer.chB.s.getRemoteSocketAddress() + " receiving file from Client at " + this.s.getRemoteSocketAddress());
                                 this.relayFile(this.dis, CMDServer.chB.dos);
                             }else if(tokens[1].equals("LOGGED OUT (SYSTEM MESSAGE)")){
                                 this.relayText(CMDServer.chB.dos, received);
                                 this.logOut();
                             }else{
                                 this.relayText(CMDServer.chB.dos, received);
+                                CMDServer.loggerServer.addLog("Server: Client at " + this.s.getRemoteSocketAddress() + " sending message \"" + tokens[1] + "\" to Client at " + CMDServer.chB.s.getRemoteSocketAddress());
                             }
                         }
                         
@@ -228,6 +209,8 @@ class CMDClientHandler implements Runnable
                         {
                             if(tokens[1].equals("FILE"))
                             {
+                                CMDServer.loggerServer.addLog("Server: Client at " + this.s.getRemoteSocketAddress() + " sending file to Client at " + CMDServer.chA.s.getRemoteSocketAddress());
+                                CMDServer.loggerServer.addLog("Server: Client at " + CMDServer.chA.s.getRemoteSocketAddress() + " receiving file from Client at " + this.s.getRemoteSocketAddress());
                                 this.relayText(CMDServer.chA.dos, received);
                                 this.relayFile(this.dis, CMDServer.chA.dos);
                             }else if(tokens[1].equals("LOGGED OUT (SYSTEM MESSAGE)")){
@@ -235,6 +218,7 @@ class CMDClientHandler implements Runnable
                                 this.logOut();
                             }else{
                                 this.relayText(CMDServer.chA.dos, received);
+                                CMDServer.loggerServer.addLog("Server: Client at " + this.s.getRemoteSocketAddress() + " sending message \"" + tokens[1] + "\" to Client at " + CMDServer.chA.s.getRemoteSocketAddress());
                             }
                         }
                     }
@@ -242,7 +226,7 @@ class CMDClientHandler implements Runnable
 
             } catch(Exception e){
 
-                e.printStackTrace(); 
+                //e.printStackTrace(); 
                 this.isLoggedIn = false;
                 if(!CMDServer.chA.isLoggedIn && !CMDServer.chB.isLoggedIn)
                 {
@@ -252,7 +236,7 @@ class CMDClientHandler implements Runnable
                         CMDServer.synchronizer.notify();
                     }
                 }
-                System.out.println("Users Exist: " + CMDServer.userExists + " for User A: " + this.isUserA + " at catch");
+                //System.out.println("Users Exist: " + CMDServer.userExists + " for User A: " + this.isUserA + " at catch");
 
                 //for other exception
                 CMDServer.loggerServer.addLog("Server: Client at " + this.s.getRemoteSocketAddress() + " has disconnected.");
@@ -269,16 +253,16 @@ class CMDClientHandler implements Runnable
                 }
                 if(CMDServer.userExists == false)
                 {
-                    System.out.println("Conditional break for User A: " + this.isUserA);
+                    //System.out.println("Conditional break for User A: " + this.isUserA);
                     break;
                 }
                     
-                System.out.println("Users Exist: " + CMDServer.userExists + " for User A: " + this.isUserA);
+                //System.out.println("Users Exist: " + CMDServer.userExists + " for User A: " + this.isUserA);
 
             }
         }
 
-        System.out.println("READ LOOP BROKEN for User A: " + this.isUserA);
+        //System.out.println("READ LOOP BROKEN for User A: " + this.isUserA);
 
 
         try{
@@ -292,7 +276,7 @@ class CMDClientHandler implements Runnable
 
         }
 
-        System.out.println("THREAD DONE for User A: " + this.isUserA);
+        //System.out.println("THREAD DONE for User A: " + this.isUserA);
         
     }
 
@@ -309,43 +293,21 @@ class CMDClientHandler implements Runnable
     void relayFile(DataInputStream dis, DataOutputStream dos)
     {
         try{
+            //System.out.println("Getting file from sender...");
 
-            System.out.println("Getting file from sender...");
-
-            //get the input file
             int filesize = 1048576;
             byte[] byteArrayR = new byte[filesize];
-                    
-            //String fileName = "ServerGet.txt";
-            //String fileName = "ServerGet.jpg";
-            //FileOutputStream fos = new FileOutputStream(fileName);
-            
-            //BufferedOutputStream bos = new BufferedOutputStream(fos);
-            //DataInputStream disReader = new DataInputStream(clientEndpoint.getInputStream());
+
             int bytesRead = dis.read(byteArrayR,0,byteArrayR.length);
             
-            //create a copy of file in server path
-            //bos.write(byteArrayR, 0 , bytesRead);
-            //bos.flush();
-            //bos.close();
-    
-            //relay to the other user
-            //byte[] byteArrayS = new byte [bytesRead];
-                    
-            //FileInputStream fis = new FileInputStream(file);
-            //BufferedInputStream bis = new BufferedInputStream(fis);
-            //bis.read(byteArray,0,byteArray.length);
-            //DataInputStream disReader = new DataInputStream(bis);
-            System.out.println("Server: relaying file (" + bytesRead + " bytes)");        
-            //sending file
-            //DataOutputStream dosWriter = new DataOutputStream(serverEndpoint.getOutputStream());
-            //System.out.println("Server: Sending file " + "\"" + fileName + "\" " + "(" + byteArray.length + " bytes)\n" );  
+            //System.out.println("Server: relaying file (" + bytesRead + " bytes)");        
+
             dos.write(byteArrayR, 0 , bytesRead);
             dos.flush();
 
         } catch(Exception e){
-            e.printStackTrace();
-            System.out.println("Server: Failed sending file");
+            //e.printStackTrace();
+            CMDServer.loggerServer.addLog("Server: Client at " + this.s.getRemoteSocketAddress() + " failed sending file.");
         }
     }
 
@@ -356,6 +318,7 @@ class CMDClientHandler implements Runnable
             this.s.close(); 
             if(!CMDServer.chA.isLoggedIn && !CMDServer.chB.isLoggedIn)
                     CMDServer.userExists = false;
+            CMDServer.loggerServer.addLog("Server: Client at " + this.s.getRemoteSocketAddress() + " has disconnected.");
         } catch(Exception e){
             
         }
