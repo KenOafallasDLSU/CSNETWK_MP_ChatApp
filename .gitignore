@@ -1,3 +1,5 @@
 *.class
 *.txt
-ServerGet.jpg
+*.jpg
+!*/Client/sendThis.jpg
+!*/Server/logs/README.txt

@@ -1,3 +1,9 @@
+/**
+* @S13
+* @author Michaela Nicole P. Dizon
+* @author Kenneth Neil B. Oafallas
+*/
+
 import java.lang.*;
 import java.net.*;
 import java.io.*;
@@ -21,10 +27,10 @@ public class Logger
             try{
                 //System.out.println(this.log.toString());
 
-                File logFile = new File(fileName);
+                File logFile = new File(".\\logs\\"+fileName);
                 logFile.createNewFile();
 
-                FileWriter logWriter = new FileWriter(fileName);
+                FileWriter logWriter = new FileWriter(".\\logs\\"+fileName);
                 logWriter.write(this.log.toString());
                 logWriter.close();
             }catch(Exception e){
