@@ -58,39 +58,38 @@ public class View {
         chatArea.setEditable(false);
 
         JScrollPane scroll = new JScrollPane(chatArea);
-        scroll.setBounds(50, 95, 400, 320);
+        scroll.setBounds(50, 90, 400, 320);
         frame.add(scroll);
 
         message = new JTextArea();
         message.setEditable(false);
 
         JScrollPane scroll2 = new JScrollPane(message);
-        scroll2.setBounds(50, 430, 300, 56);
+        scroll2.setBounds(50, 425, 300, 56);
         message.setLineWrap(true);
         frame.add(scroll2);
 
         fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
 
         sendFileButton = new JButton("Send file");
-        sendFileButton.setBounds(360, 430, 90, 25);
+        sendFileButton.setBounds(360, 425, 90, 25);
         sendFileButton.setEnabled(false);
         frame.add(sendFileButton);
 
         sendButton = new JButton("Send");
-        sendButton.setBounds(360, 460, 90, 25);
+        sendButton.setBounds(360, 455, 90, 25);
         sendButton.setEnabled(false);
         frame.add(sendButton);
 
         tempLabel = new JLabel("");
-        tempLabel.setBounds(50, 490, 380, 25);
+        tempLabel.setBounds(50, 485, 380, 25);
         frame.add(tempLabel);
 
         saveFileButton = new JButton("Save file");
-        saveFileButton.setBounds(360, 490, 90, 25);
+        saveFileButton.setBounds(360, 485, 90, 25);
         saveFileButton.setEnabled(false);
         frame.add(saveFileButton);
 
-//        setSaveFileButton();
         frame.revalidate();
         frame.repaint();
     }
@@ -117,37 +116,36 @@ public class View {
 
     public void setTemp(String text) {
         tempLabel.setText(text);
+
+        if(text == null) {
+            saveFileButton.setEnabled(false);
+        }
+        else {
+            saveFileButton.setEnabled(true);
+        }
     }
 
     public void sendFile() {
         int r = fileChooser.showOpenDialog(null);
-
-        setTemp("hi");
+        file = fileChooser.getSelectedFile();
 
         if(r == JFileChooser.APPROVE_OPTION) {
-            // send file
+            setTemp(file.getName());
         }
+    }
+
+    public File getFile() {
+        return new File(fileChooser.getCurrentDirectory(), fileChooser.getSelectedFile().getName());
     }
 
     public void saveFile() {
         int r = fileChooser.showSaveDialog(null);
-        String dir = fileChooser.getSelectedFile().getAbsolutePath();
 
         if(r == JFileChooser.APPROVE_OPTION) {
-            file = fileChooser.getSelectedFile();
-            // save file
+            file = getFile();
+            message("File saved to " + file.getAbsolutePath());
         }
     }
-
-//    public void setSaveFileButton() {
-//        if(this.tempLabel.equals("")) {
-//            this.saveFileButton.setEnabled(false);
-//        }
-//        else {
-//            setTemp("");
-//            this.saveFileButton.setEnabled(true);
-//        }
-//    }
 
     public void login() {
         String username = getUsername();
@@ -176,6 +174,7 @@ public class View {
         this.chatArea.setText("");
         this.message.setText("");
         this.message.setEditable(false);
+        this.tempLabel.setText("");
         this.sendFileButton.setEnabled(false);
         this.sendButton.setEnabled(false);
         this.saveFileButton.setEnabled(false);

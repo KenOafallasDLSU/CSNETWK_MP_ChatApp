@@ -26,7 +26,10 @@ public class Controller {
             }
             if(e.getActionCommand().equals("Save file")) {
                 view.saveFile();
+                model.setFile(view.getFile());
+                System.out.println(model.getFile());
 
+//                view.setTemp(model.getFile().getName());
             }
             if(e.getActionCommand().equals("Login")) {
                 if(!(view.getUsername().equals(""))) {
