@@ -1,5 +1,7 @@
 import java.awt.event.*;
 
+import static java.lang.Integer.parseInt;
+
 public class Controller {
 
     private View view;
@@ -32,12 +34,24 @@ public class Controller {
 //                view.setTemp(model.getFile().getName());
             }
             if(e.getActionCommand().equals("Login")) {
-                if(!(view.getUsername().equals(""))) {
-                    model.setUsername(view.getUsername());
-                    view.login();
+                String user = view.getUsername();
+                int port = view.getPort();
+
+                if(port != -1) {
+                    if(!(user.equals(""))) {
+                        model.setUsername(user);
+                        model.setPort(port);
+
+//                    model.connect(user, port);
+
+                        view.login();
+                    }
+                    else {
+                        view.message("Username cannot be blank!");
+                    }
                 }
                 else {
-                    view.message("Username cannot be blank!");
+                    view.message("Please input a valid port number.");
                 }
             }
             if(e.getActionCommand().equals("Logout")) {

@@ -3,5 +3,7 @@ public class Driver {
         Model model = new Model();
         View view = new View();
         Controller controller = new Controller(model, view);
+
+        // CMDServer server = new CMDServer(4000);
     }
 }

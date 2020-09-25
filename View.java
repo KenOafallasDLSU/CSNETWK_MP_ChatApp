@@ -4,12 +4,17 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 
+import static java.lang.Integer.parseInt;
+
 public class View {
 
     private JFrame frame;
 
-    private JLabel label;
+    private JLabel userLabel;
     private JTextField username;
+
+    private JLabel portLabel;
+    private JTextField port;
 
     private JTextArea chatArea;
     private JTextArea message;
@@ -21,7 +26,7 @@ public class View {
     private JButton logoutButton;
 
     private JFileChooser fileChooser;
-    private JLabel tempLabel;
+    private JLabel fileLabel;
 
     private File file;
 
@@ -35,21 +40,29 @@ public class View {
         frame.setLocationRelativeTo(null);
 
         username = new JTextField();
-        username.setBounds(50, 50, 300, 26);
+        username.setBounds(50, 55, 200, 26);
         frame.add(username);
 
+        port = new JTextField();
+        port.setBounds(260, 55, 90, 26);
+        frame.add(port);
+
         loginButton = new JButton("Login");
-        loginButton.setBounds(360, 50, 90, 25);
+        loginButton.setBounds(360, 55, 90, 25);
         frame.add(loginButton);
 
-        label = new JLabel();
-        label.setBounds(50,50,300,26);
-        label.setFont(new Font("Sans Serif", Font.BOLD, 14));
-        label.setVisible(false);
-        frame.add(label);
+        userLabel = new JLabel("Username");
+        userLabel.setBounds(50,27,200,26);
+        userLabel.setFont(new Font("Sans Serif", Font.BOLD, 13));
+        frame.add(userLabel);
+
+        portLabel = new JLabel("Port");
+        portLabel.setBounds(260, 27, 90, 26);
+        portLabel.setFont(new Font("Sans Serif", Font.BOLD, 13));
+        frame.add(portLabel);
 
         logoutButton = new JButton("Logout");
-        logoutButton.setBounds(360, 50, 90, 25);
+        logoutButton.setBounds(360, 55, 90, 25);
         logoutButton.setVisible(false);
         frame.add(logoutButton);
 
@@ -65,28 +78,29 @@ public class View {
         message.setEditable(false);
 
         JScrollPane scroll2 = new JScrollPane(message);
-        scroll2.setBounds(50, 425, 300, 56);
+        scroll2.setBounds(50, 420, 300, 56);
         message.setLineWrap(true);
         frame.add(scroll2);
 
         fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
 
         sendFileButton = new JButton("Send file");
-        sendFileButton.setBounds(360, 425, 90, 25);
+        sendFileButton.setBounds(360, 420, 90, 25);
         sendFileButton.setEnabled(false);
         frame.add(sendFileButton);
 
         sendButton = new JButton("Send");
-        sendButton.setBounds(360, 455, 90, 25);
+        sendButton.setBounds(360, 450, 90, 25);
         sendButton.setEnabled(false);
         frame.add(sendButton);
 
-        tempLabel = new JLabel("");
-        tempLabel.setBounds(50, 485, 380, 25);
-        frame.add(tempLabel);
+        fileLabel = new JLabel("");
+        fileLabel.setBounds(50, 480, 380, 25);
+        frame.add(fileLabel);
 
         saveFileButton = new JButton("Save file");
-        saveFileButton.setBounds(360, 485, 90, 25);
+        saveFileButton.setBounds(360, 480, 90, 25);
+        saveFileButton.setVisible(false);
         saveFileButton.setEnabled(false);
         frame.add(saveFileButton);
 
@@ -106,6 +120,20 @@ public class View {
         return this.username.getText();
     }
 
+    public int getPort() {
+        int temp = -1;
+        try {
+            temp = Integer.parseInt(this.port.getText());
+            System.out.println(temp);
+            return temp;
+        }
+        catch(Exception e) {
+            System.out.println("fail: " + temp);
+            return temp;
+        }
+//        return parseInt(this.port.getText());
+    }
+
     public void setMessage(String message) {
         this.message.setText(message);
     }
@@ -115,12 +143,14 @@ public class View {
     }
 
     public void setTemp(String text) {
-        tempLabel.setText(text);
+        fileLabel.setText(text);
 
         if(text == null) {
+            saveFileButton.setVisible(false);
             saveFileButton.setEnabled(false);
         }
         else {
+            saveFileButton.setVisible(true);
             saveFileButton.setEnabled(true);
         }
     }
@@ -151,11 +181,14 @@ public class View {
         String username = getUsername();
         this.username.setText(username);
 
-        this.username.setVisible(false);
+        this.username.setEditable(false);
+        this.port.setEditable(false);
+//        this.username.setVisible(false);
         this.loginButton.setVisible(false);
 
-        this.label.setText("Welcome " + username);
-        this.label.setVisible(true);
+        this.userLabel.setText("Welcome " + username);
+        this.userLabel.setVisible(true);
+        this.portLabel.setVisible(false);
         this.logoutButton.setVisible(true);
 
         this.message.setEditable(true);
@@ -164,17 +197,20 @@ public class View {
     }
 
     public void logout() {
-        this.label.setText("Welcome ");
-        this.label.setVisible(false);
+        this.userLabel.setText("Username");
+        this.portLabel.setText("Port");
+        this.portLabel.setVisible(true);
 
-        this.username.setVisible(true);
+        this.username.setEditable(true);
         this.username.setText("");
+        this.port.setEditable(true);
+        this.port.setText("");
         this.loginButton.setVisible(true);
 
         this.chatArea.setText("");
         this.message.setText("");
         this.message.setEditable(false);
-        this.tempLabel.setText("");
+        this.fileLabel.setText("");
         this.sendFileButton.setEnabled(false);
         this.sendButton.setEnabled(false);
         this.saveFileButton.setEnabled(false);
