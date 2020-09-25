@@ -29,7 +29,13 @@ public class Controller {
 
                             if(msg.getText().equals("FILEFILEFILE"))
                             {
+                                view.saveFile();
+                                model.setFile(view.getFile());
                                 
+                                // model.setPath(view.getPath());
+                                String path = model.getFile().getAbsolutePath();
+
+
                                 //what to do with files??
 
                             } else if(msg.getText().equals("ENDENDEND")){

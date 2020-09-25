@@ -29,9 +29,10 @@ public class View {
     private JLabel fileLabel;
 
     private File file;
+    // private String path;
 
     public View () {
-        frame = new JFrame("Chat App");
+        frame = new JFrame("De La Salle Usap");
 
         frame.setSize(520, 600);
         frame.setLayout(null);
@@ -155,6 +156,14 @@ public class View {
         }
     }
 
+    // public String getPath() {
+    //     return path;
+    // }
+
+    // public void setPath(String path) {
+    //     this.path = path;
+    // }
+
     public void sendFile() {
         int r = fileChooser.showOpenDialog(null);
         file = fileChooser.getSelectedFile();
@@ -173,7 +182,11 @@ public class View {
 
         if(r == JFileChooser.APPROVE_OPTION) {
             file = getFile();
-            message("File saved to " + file.getAbsolutePath());
+
+            // setPath(file.getAbsolutePath());
+            setFile(file);
+
+            // message("File saved to " + file.getAbsolutePath());
         }
     }
 

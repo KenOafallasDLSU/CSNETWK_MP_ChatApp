@@ -21,6 +21,7 @@ public class Logger
 
     public void promptLogs()
     {
+        JOptionPane.showMessageDialog(null, "message");
         System.out.println("Print the logs?? [Y]es [N]o");
         if(true)
         {
