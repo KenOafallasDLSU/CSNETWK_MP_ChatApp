@@ -53,6 +53,7 @@ public class Client
 
                             } else{
 
+                                System.out.println("Received str: " + str);
                                 receiveText(str);
                                 
                             }
@@ -183,11 +184,11 @@ public class Client
 
             //System.out.print("Enter filepath: ");
             //String fileName = scn.nextLine(); 
-            //String fileName = "sendThis.jpg";
+            String fileName = "sendThis.jpg";
 
             //read file
             //String fileName = f.replace("\\","\\\\");
-            //File file = new File(fileName);
+            File file = new File(fileName);
             byte[] byteArray = new byte [(int)file.length()];
 			
 			FileInputStream fis = new FileInputStream(file);
@@ -216,7 +217,7 @@ public class Client
         } 
     }
 
-    public void receiveFile()
+    public void receiveFile(byte[] byteArray)
     {
         //System.out.println("RECEIVE FILE");
         try{
@@ -224,14 +225,14 @@ public class Client
 
             //System.out.println("Receiving file");
 
-            String fileName = "C:\\Users\\dell\\Desktop\\CCS Files\\Year 2 Term 3\\CSNETWK\\project\\CSNETWK_MP_ChatApp\\leFold\\gotcha.jpg";
+            //String fileName = "C:\\Users\\dell\\Desktop\\CCS Files\\Year 2 Term 3\\CSNETWK\\project\\CSNETWK_MP_ChatApp\\leFold\\gotcha.jpg";
 
-            int filesize = 1048576;
-            byte[] byteArray = new byte[filesize];
+            //int filesize = 1048576;
+            //byte[] byteArray = new byte[filesize];
 
-            FileOutputStream fos = new FileOutputStream(fileName);
-            BufferedOutputStream bos = new BufferedOutputStream(fos);
-            int bytesRead = dis.read(byteArray,0,byteArray.length);
+            //FileOutputStream fos = new FileOutputStream(fileName);
+            //BufferedOutputStream bos = new BufferedOutputStream(fos);
+            bytesRead = dis.read(byteArray,0,byteArray.length);
 
             Message msg = new Message();
             msg.setText("FILEFILEFILE");

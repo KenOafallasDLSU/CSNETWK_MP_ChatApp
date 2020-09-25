@@ -22,22 +22,37 @@ public class Logger
     public void promptLogs()
     {
         System.out.println("Print the logs?? [Y]es [N]o");
-        if(true)
-        {
-            try{
-                //System.out.println(this.log.toString());
 
-                File logFile = new File(".\\logs\\"+fileName);
-                logFile.createNewFile();
+        //hardcoded yes/no
 
-                FileWriter logWriter = new FileWriter(".\\logs\\"+fileName);
-                logWriter.write(this.log.toString());
-                logWriter.close();
-            }catch(Exception e){
-                e.printStackTrace();
+        //boolean print = //the prompt
+
+        if(true){
+            String PATH = ".\\logs\\";
+    
+            File directory = new File(PATH);
+            if (! directory.exists()){
+                directory.mkdirs();
             }
-            
+
+            if(true)
+            {
+                try{
+                    //System.out.println(this.log.toString());
+
+                    File logFile = new File(".\\logs\\"+fileName);
+                    logFile.createNewFile();
+
+                    FileWriter logWriter = new FileWriter(".\\logs\\"+fileName);
+                    logWriter.write(this.log.toString());
+                    logWriter.close();
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+                
+            }
         }
+        
     }
 
     public void addLog(String s)

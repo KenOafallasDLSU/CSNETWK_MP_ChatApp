@@ -174,6 +174,7 @@ class CMDClientHandler implements Runnable
                 received = dis.readUTF();
                 tokens = received.split(": ", 2);
                 CMDServer.loggerServer.addLog(received);
+                /*
                 if(this.isUserA)
                 {   
                     CMDServer.loggerB.addHistory(received);
@@ -186,7 +187,9 @@ class CMDClientHandler implements Runnable
                     //     CMDServer.loggerB.addHistory(received);
                     // else
                 }
-                
+                */
+                CMDServer.loggerB.addHistory(received);
+                CMDServer.loggerA.addHistory(received);
                 
                     
 
@@ -205,7 +208,7 @@ class CMDClientHandler implements Runnable
                         {
                             if(tokens[1].equals("FILE"))
                             {
-                                this.relayText(CMDServer.chB.dos, received);
+                                //this.relayText(CMDServer.chB.dos, received);
                                 this.relayFile(this.dis, CMDServer.chB.dos);
                             }else if(tokens[1].equals("LOGGED OUT (SYSTEM MESSAGE)")){
                                 this.relayText(CMDServer.chB.dos, received);
@@ -314,17 +317,17 @@ class CMDClientHandler implements Runnable
             byte[] byteArrayR = new byte[filesize];
                     
             //String fileName = "ServerGet.txt";
-            String fileName = "ServerGet.jpg";
-            FileOutputStream fos = new FileOutputStream(fileName);
+            //String fileName = "ServerGet.jpg";
+            //FileOutputStream fos = new FileOutputStream(fileName);
             
-            BufferedOutputStream bos = new BufferedOutputStream(fos);
+            //BufferedOutputStream bos = new BufferedOutputStream(fos);
             //DataInputStream disReader = new DataInputStream(clientEndpoint.getInputStream());
             int bytesRead = dis.read(byteArrayR,0,byteArrayR.length);
             
             //create a copy of file in server path
-            bos.write(byteArrayR, 0 , bytesRead);
-            bos.flush();
-            bos.close();
+            //bos.write(byteArrayR, 0 , bytesRead);
+            //bos.flush();
+            //bos.close();
     
             //relay to the other user
             //byte[] byteArrayS = new byte [bytesRead];
@@ -333,7 +336,7 @@ class CMDClientHandler implements Runnable
             //BufferedInputStream bis = new BufferedInputStream(fis);
             //bis.read(byteArray,0,byteArray.length);
             //DataInputStream disReader = new DataInputStream(bis);
-            System.out.println("Server: relaying bytes: " + bytesRead);        
+            System.out.println("Server: relaying file (" + bytesRead + " bytes)");        
             //sending file
             //DataOutputStream dosWriter = new DataOutputStream(serverEndpoint.getOutputStream());
             //System.out.println("Server: Sending file " + "\"" + fileName + "\" " + "(" + byteArray.length + " bytes)\n" );  
