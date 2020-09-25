@@ -15,11 +15,11 @@ public class Logger
 
     public void promptLogs()
     {
-        System.out.println("Print the logz?? [Y]es [N]o");
+        System.out.println("Print the logs?? [Y]es [N]o");
         if(true)
         {
             try{
-                System.out.println(this.log.toString());
+                //System.out.println(this.log.toString());
 
                 File logFile = new File(fileName);
                 logFile.createNewFile();

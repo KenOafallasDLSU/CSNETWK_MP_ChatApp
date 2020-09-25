@@ -25,7 +25,8 @@ public class CMDServer
 		try 
 		{   
             ServerSocket serverSocket = new ServerSocket(nPort);
-            CMDServer.loggerServer = new Logger("log.txt");
+            String logName = "log-"+java.time.LocalDateTime.now()+".txt";
+            CMDServer.loggerServer = new Logger(logName.replace(':','-'));
             CMDServer.loggerA = new Logger("logA.txt");
             CMDServer.loggerB = new Logger("logB.txt");
 
@@ -320,12 +321,13 @@ class CMDClientHandler implements Runnable
             //DataInputStream disReader = new DataInputStream(clientEndpoint.getInputStream());
             int bytesRead = dis.read(byteArrayR,0,byteArrayR.length);
             
+            //create a copy of file in server path
             bos.write(byteArrayR, 0 , bytesRead);
             bos.flush();
             bos.close();
     
             //relay to the other user
-            byte[] byteArrayS = new byte [bytesRead];
+            //byte[] byteArrayS = new byte [bytesRead];
                     
             //FileInputStream fis = new FileInputStream(file);
             //BufferedInputStream bis = new BufferedInputStream(fis);
@@ -335,7 +337,7 @@ class CMDClientHandler implements Runnable
             //sending file
             //DataOutputStream dosWriter = new DataOutputStream(serverEndpoint.getOutputStream());
             //System.out.println("Server: Sending file " + "\"" + fileName + "\" " + "(" + byteArray.length + " bytes)\n" );  
-            dos.write(byteArrayS, 0 , bytesRead);
+            dos.write(byteArrayR, 0 , bytesRead);
             dos.flush();
 
         } catch(Exception e){

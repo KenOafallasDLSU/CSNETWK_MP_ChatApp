@@ -164,7 +164,7 @@ public class CMDClient
             // String fileName = scn.nextLine();
             //scn.nextLine();
 
-            String fileName = "gotcha.jpg";
+            String fileName = "C:\\Users\\dell\\Desktop\\CCS Files\\Year 2 Term 3\\CSNETWK\\project\\CSNETWK_MP_ChatApp\\leFold\\gotcha.jpg";
 
             int filesize = 1048576;
             byte[] byteArray = new byte[filesize];
