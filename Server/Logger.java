@@ -22,9 +22,7 @@ public class Logger
 
     public void promptLogs()
     {
-        System.out.println("Print the logs?? [Y]es [N]o");
-
-        //hardcoded yes/no
+        System.out.println("Print the logs?");
 
         boolean print = false;
         int result = JOptionPane.showConfirmDialog(
@@ -61,6 +59,7 @@ public class Logger
             }catch(Exception e){
                 e.printStackTrace();
             }
+        }
     }
 
     public void addLog(String s)

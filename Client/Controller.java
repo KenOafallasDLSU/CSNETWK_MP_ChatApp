@@ -1,5 +1,6 @@
 import java.awt.event.*;
 import java.util.concurrent.BlockingQueue;
+import java.io.*;
 
 public class Controller {
 
@@ -26,7 +27,13 @@ public class Controller {
             }
             if(e.getActionCommand().equals("Send file")) {
                 //invoke model
+                
                 view.sendFile();
+                if(view.getFile() != null){
+                    model.sendText(view.getChatArea(), "Sending file " + view.getFile().getName() + "...");
+                    model.sendFile(view.getFile());
+                }
+                
 
             }
             if(e.getActionCommand().equals("Save file")) {
@@ -90,8 +97,16 @@ public class Controller {
                                 view.saveFile();
                                 model.setFile(view.getFile());
                                 
-                                // model.setPath(view.getPath());
                                 String path = model.getFile().getAbsolutePath();
+                                System.out.println(path);
+
+                                int filesize = msg.getFilesize();
+                                byte[] byteArray = new byte[filesize];
+                                FileOutputStream fos = new FileOutputStream(path);
+                                BufferedOutputStream bos = new BufferedOutputStream(fos);
+                                bos.write(msg.getBytes(), 0 , filesize);
+                                bos.flush();
+                                bos.close();
 
                             } else if(msg.getText().equals("ENDENDEND")){
 

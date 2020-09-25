@@ -46,7 +46,7 @@ public class Model {
     }
 
     public void activateClient(){
-        this.client = new Client(this.username, 4000, this.queue);
+        this.client = new Client(this.username, this.port, this.queue);
     }
 
     public void setConversation(String oldText, String newText) {
