@@ -78,7 +78,7 @@ public class Controller {
                 model.setFile(view.getFile());
                 System.out.println(model.getFile());
 
-//                view.setTemp(model.getFile().getName());
+//                view.setFileLabel(model.getFile().getName());
             }
             if(e.getActionCommand().equals("Login")) {
                 String user = view.getUsername();

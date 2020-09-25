@@ -124,11 +124,11 @@ public class View {
         int temp = -1;
         try {
             temp = Integer.parseInt(this.port.getText());
-            System.out.println(temp);
+            // System.out.println(temp);
             return temp;
         }
         catch(Exception e) {
-            System.out.println("fail: " + temp);
+            // System.out.println("fail: " + temp);
             return temp;
         }
 //        return parseInt(this.port.getText());
@@ -142,7 +142,7 @@ public class View {
         this.chatArea.setText(text);
     }
 
-    public void setTemp(String text) {
+    public void setFileLabel(String text) {
         fileLabel.setText(text);
 
         if(text == null) {
@@ -160,7 +160,7 @@ public class View {
         file = fileChooser.getSelectedFile();
 
         if(r == JFileChooser.APPROVE_OPTION) {
-            setTemp(file.getName());
+            setFileLabel(file.getName());
         }
     }
 
@@ -206,6 +206,7 @@ public class View {
         this.port.setEditable(true);
         this.port.setText("");
         this.loginButton.setVisible(true);
+        this.logoutButton.setVisible(false);
 
         this.chatArea.setText("");
         this.message.setText("");
