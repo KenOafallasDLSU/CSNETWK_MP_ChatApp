@@ -177,6 +177,10 @@ public class View {
         return new File(fileChooser.getCurrentDirectory(), fileChooser.getSelectedFile().getName());
     }
 
+    public void setFile(File file) {
+        this.file = file;
+    }
+
     public void saveFile() {
         int r = fileChooser.showSaveDialog(null);
 

@@ -7,6 +7,7 @@
 import java.lang.*;
 import java.net.*;
 import java.io.*;
+import javax.swing.*;
 
 public class Logger
 {
@@ -21,8 +22,20 @@ public class Logger
 
     public void promptLogs()
     {
-        JOptionPane.showMessageDialog(null, "message");
-        System.out.println("Print the logs?? [Y]es [N]o");
+        int result = JOptionPane.showConfirmDialog(
+            null, "Print the logs?", null,
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE);
+
+            if(result == JOptionPane.YES_OPTION){
+                System.out.println("Yes");
+            }else if (result == JOptionPane.NO_OPTION){
+                System.out.println("No");
+            }else {
+                System.out.println("None selected");
+            }
+
+        // System.out.println("Print the logs?? [Y]es [N]o");
         if(true)
         {
             try{
