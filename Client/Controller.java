@@ -34,7 +34,7 @@ public class Controller {
                 model.setFile(view.getFile());
                 System.out.println(model.getFile());
 
-//                view.setTemp(model.getFile().getName());
+//                view.setFileLabel(model.getFile().getName());
             }
             if(e.getActionCommand().equals("Login")) {
                 String user = view.getUsername();
@@ -87,11 +87,11 @@ public class Controller {
 
                             if(msg.getText().equals("FILEFILEFILE"))
                             {
+                                view.saveFile();
+                                model.setFile(view.getFile());
                                 
-                                //calls the popup
-
-                                //filepath = popup.getpath()
-                                //model.createFile(filepath, msg)
+                                // model.setPath(view.getPath());
+                                String path = model.getFile().getAbsolutePath();
 
                             } else if(msg.getText().equals("ENDENDEND")){
 

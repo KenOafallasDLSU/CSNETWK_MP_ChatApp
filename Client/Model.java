@@ -9,6 +9,7 @@ public class Model {
     private Client client;
     private BlockingQueue<Message> queue;
     private int port;
+    // private String path;
 
     public Model(BlockingQueue<Message> q)
     {
@@ -27,6 +28,14 @@ public class Model {
     public File getFile() {
         return file;
     }
+
+    // public String getPath() {
+    //     return path;
+    // }
+
+    // public void setPath(String path) {
+    //     this.path = path;
+    // }
 
     public void setUsername(String username) {
         this.username = username;

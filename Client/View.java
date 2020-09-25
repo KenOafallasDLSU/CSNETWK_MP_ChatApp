@@ -29,9 +29,10 @@ public class View {
     private JLabel fileLabel;
 
     private File file;
+    // private String path;
 
     public View () {
-        frame = new JFrame("Chat App");
+        frame = new JFrame("De La Salle Usap");
 
         frame.setSize(520, 600);
         frame.setLayout(null);
@@ -124,11 +125,11 @@ public class View {
         int temp = -1;
         try {
             temp = Integer.parseInt(this.port.getText());
-            System.out.println(temp);
+            // System.out.println(temp);
             return temp;
         }
         catch(Exception e) {
-            System.out.println("fail: " + temp);
+            // System.out.println("fail: " + temp);
             return temp;
         }
 //        return parseInt(this.port.getText());
@@ -142,7 +143,7 @@ public class View {
         this.chatArea.setText(text);
     }
 
-    public void setTemp(String text) {
+    public void setFileLabel(String text) {
         fileLabel.setText(text);
 
         if(text == null) {
@@ -155,12 +156,20 @@ public class View {
         }
     }
 
+    // public String getPath() {
+    //     return path;
+    // }
+
+    // public void setPath(String path) {
+    //     this.path = path;
+    // }
+
     public void sendFile() {
         int r = fileChooser.showOpenDialog(null);
         file = fileChooser.getSelectedFile();
 
         if(r == JFileChooser.APPROVE_OPTION) {
-            setTemp(file.getName());
+            setFileLabel(file.getName());
         }
     }
 
@@ -168,12 +177,20 @@ public class View {
         return new File(fileChooser.getCurrentDirectory(), fileChooser.getSelectedFile().getName());
     }
 
+    public void setFile(File file) {
+        this.file = file;
+    }
+
     public void saveFile() {
         int r = fileChooser.showSaveDialog(null);
 
         if(r == JFileChooser.APPROVE_OPTION) {
             file = getFile();
-            message("File saved to " + file.getAbsolutePath());
+
+            // setPath(file.getAbsolutePath());
+            setFile(file);
+
+            // message("File saved to " + file.getAbsolutePath());
         }
     }
 
@@ -206,6 +223,7 @@ public class View {
         this.port.setEditable(true);
         this.port.setText("");
         this.loginButton.setVisible(true);
+        this.logoutButton.setVisible(false);
 
         this.chatArea.setText("");
         this.message.setText("");
