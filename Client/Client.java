@@ -49,14 +49,9 @@ public class Client
                             tokens = str.split(": ", 2);
                             if(tokens[1].equals("FILE"))
                             {
-
                                 receiveFile();
-
                             } else{
-
-                                //System.out.println("Received str: " + str);
                                 receiveText(str);
-                                
                             }
                             
                         } catch (Exception e) { 
@@ -67,6 +62,8 @@ public class Client
             }); 
 
             readMessage.start(); 
+            this.dos.writeUTF(name + ": LOGGED IN (SYSTEM MESSAGE)"); 
+
 
             //readMessage.join(); 
         } catch(Exception e){
@@ -76,8 +73,6 @@ public class Client
 
     public void logout()
     {
-        //System.out.println("You logged out");
-
         try { 
             dos.writeUTF(name + ": LOGGED OUT (SYSTEM MESSAGE)"); 
 
@@ -101,44 +96,33 @@ public class Client
             dos.writeUTF(name +": FILE"); 
             dos.flush();
 
-            //System.out.print("Enter filepath: ");
-            //String fileName = scn.nextLine(); 
-            //String fileName = "sendThis.jpg";
-
-            //read file
-            //String fileName = f.replace("\\","\\\\");
-            //File file = new File(fileName);
             byte[] byteArray = new byte [1024*8];;
 			
 			FileInputStream fis = new FileInputStream(file);
-			BufferedInputStream bis = new BufferedInputStream(fis);
-            //bis.read(byteArray,0,byteArray.length);
-            //DataInputStream disReader = new DataInputStream(bis);
-            
+			BufferedInputStream bis = new BufferedInputStream(fis);            
             
             int count;
             while ((count = bis.read(byteArray,0,byteArray.length)) >= 1024*8)
             {
                 dos.writeUTF("FILEPART");
+                dos.flush();
+
                 dos.write(byteArray, 0, count);
                 dos.flush();
-                //
-                System.out.println("Read " + count + " bytes in one count of Client.sendFile");
+                
+                //System.out.println("Read " + count + " bytes in one count of Client.sendFile");
             }
             
-            //dos.writeUTF("FILEPART");
-            /*
-            int count = bis.read(byteArray,0,byteArray.length);
-            System.out.println("Read " + count + " bytes in Client.sendFile");
-            */
             dos.writeUTF("FILEEND");
-            dos.write(byteArray, 0, count);
-            System.out.println("Read " + count + " bytes in fileend of Client.sendFile");
-
             dos.flush();
 
+            dos.write(byteArray, 0, count);
+            dos.flush();
+
+            //System.out.println("Read " + count + " bytes in fileend of Client.sendFile");
+
         } catch(Exception e){
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         
     }
@@ -149,32 +133,23 @@ public class Client
             // write on the output stream 
             this.dos.writeUTF(name + ": " + msg); 
         } catch (IOException e) { 
-            e.printStackTrace(); 
+            //e.printStackTrace(); 
         } 
     }
 
     public void receiveFile()
     {
-        //System.out.println("RECEIVE FILE");
         try{
-            //String fileName = dis.readUTF(); 
-
-            //System.out.println("Receiving file");
-
-            //String fileName = "C:\\Users\\dell\\Desktop\\CCS Files\\Year 2 Term 3\\CSNETWK\\project\\CSNETWK_MP_ChatApp\\leFold\\gotcha.jpg";
-
             int filesize = 1024*8;
             byte[] byteArray;
 
-            //FileOutputStream fos = new FileOutputStream(fileName);
-            //BufferedOutputStream bos = new BufferedOutputStream(fos);
             int bytesRead;
             
             while(dis.readUTF().equals("FILEPART"))
             {
                 byteArray = new byte[filesize];
                 bytesRead = dis.read(byteArray,0,byteArray.length);
-                System.out.println("Read " + bytesRead + " bytes in one loop of Client.receiveFile");
+                //System.out.println("Read " + bytesRead + " bytes in one loop of Client.receiveFile");
 
                 Message msg = new Message(bytesRead);
                 msg.setText("FILEPART");
@@ -184,18 +159,12 @@ public class Client
 
             byteArray = new byte[filesize];
             bytesRead = dis.read(byteArray,0,byteArray.length);
-            System.out.println("Finished Client.receiveFile with " + bytesRead);
+            //System.out.println("Finished Client.receiveFile with " + bytesRead);
 
             Message msg = new Message(bytesRead);
             msg.setText("FILEEND");
             msg.setBytes(byteArray);
             this.queue.put(msg);
-            
-            // System.out.println("received bytes: " + bytesRead);
-    
-            // bos.write(byteArray, 0 , bytesRead);
-            // bos.flush();
-            // bos.close();
         } catch(Exception e)
         {
             e.printStackTrace();
@@ -203,13 +172,6 @@ public class Client
         
     }
 
-    /*
-    public void receiveText(String msg)
-    {
-        if(!msg.equals(""))
-            System.out.println(msg); 
-    }
-    */
     public void receiveText(String str) {
         try{
             Message msg = new Message();

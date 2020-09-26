@@ -9,18 +9,22 @@ public class Model {
     private Client client;
     private BlockingQueue<Message> queue;
     private int port;
-    // private String path;
-    private String IPaddress;
+    private String ip;
 
     public Model(BlockingQueue<Message> q)
     {
         this.queue = q;
         this.client = null;
-        this.IPaddress = "localhost";
+        this.ip = null;
+        // this.ip = "localhost";
     }
 
     public String getUsername() {
         return username;
+    }
+    
+    public String getIP() {
+        return ip;
     }
 
     public String getConversation() {
@@ -31,16 +35,12 @@ public class Model {
         return file;
     }
 
-    // public String getPath() {
-    //     return path;
-    // }
-
-    // public void setPath(String path) {
-    //     this.path = path;
-    // }
-
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public void setIP(String ip) {
+        this.ip = ip;
     }
 
     public void setPort(int port) {
@@ -48,7 +48,7 @@ public class Model {
     }
 
     public void activateClient(){
-        this.client = new Client(this.IPaddress, this.username, this.port, this.queue);
+        this.client = new Client(this.ip, this.username, this.port, this.queue);
     }
 
     public void setConversation(String oldText, String newText) {
@@ -60,7 +60,6 @@ public class Model {
         this.file = file;
     }
 
-    /*New codes*/
     public void sendText(String oldText, String newText) {
         client.sendText(newText);
         conversation = oldText + "\n" + getUsername() + ": " + newText;

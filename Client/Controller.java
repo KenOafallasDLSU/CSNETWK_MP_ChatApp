@@ -16,7 +16,6 @@ public class Controller {
         view.addButtonActionListener((ActionEvent e) -> {
             if(e.getActionCommand().equals("Send")) {
                 if(!(view.getMessage().equals(""))) {
-                    //model.setConversation(view.getChatArea(), view.getMessage());
                     model.sendText(view.getChatArea(), view.getMessage());
                     view.setChatArea(model.getConversation());
                     view.setMessage("");
@@ -27,49 +26,54 @@ public class Controller {
             }
             if(e.getActionCommand().equals("Send file")) {
                 //invoke model
-                
                 view.sendFile();
+
                 if(view.getFile() != null){
                     model.sendText(view.getChatArea(), "Sending file " + view.getFile().getName() + "...");
+                    view.setChatArea(model.getConversation());
                     model.sendFile(view.getFile());
                 }
                 
 
             }
-            if(e.getActionCommand().equals("Save file")) {
-                view.saveFile();
-                model.setFile(view.getFile());
-                System.out.println(model.getFile());
-
-//                view.setFileLabel(model.getFile().getName());
-            }
             if(e.getActionCommand().equals("Login")) {
                 String user = view.getUsername();
+                String ip = view.getIP();
                 int port = view.getPort();
 
-                if(port != -1) {
-                    if(!(user.equals(""))) {
-                        model.setUsername(user);
-                        model.setPort(port);
-                        model.activateClient();
-
-//                    model.connect(user, port);
-                        runAccepter();
-
-                        view.login();
+                if(!(user.equals(""))) {
+                    if(ip.equals("")) {
+                        view.message("IP cannot be blank.");
+                    }
+                    else if(ip.equals("localhost") || ip.equals("127.0.0.1")) {
+                        if(port != 4000) {
+                            view.message("Port is unavailable. Please connect to Port 4000");
+                        }
+                        else if(port == -1) {
+                            view.message("Please input a valid port number.");
+                        }
+                        else {
+                            model.setUsername(user);
+                            model.setIP(ip);
+                            model.setPort(port);
+                            model.activateClient();
+    
+                            runAccepter();
+    
+                            view.login();
+                        }
                     }
                     else {
-                        view.message("Username cannot be blank!");
+                        view.message("Please connect to localhost or 127.0.0.1");
                     }
                 }
                 else {
-                    view.message("Please input a valid port number.");
+                    view.message("Username cannot be blank!");
                 }
             }
             if(e.getActionCommand().equals("Logout")) {
                 view.logout();
                 view.message("You have been logged out!");
-                //
                 model.logout();
             }
         });
@@ -88,9 +92,7 @@ public class Controller {
                     while (flag) { 
                         try { 
                             // read the message sent to this client 
-                            //System.out.println("Waiting for take");
                             Message msg = queue.take();
-                            //System.out.println("Took:" + msg.getText());
 
                             if(msg.getText().equals("FILEPART"))
                             {
@@ -101,9 +103,6 @@ public class Controller {
                                 FileOutputStream fos = new FileOutputStream(path);
                                 BufferedOutputStream bos = new BufferedOutputStream(fos);
 
-                                //
-                                System.out.println(path);
-
                                 int filesize;
                                 //byte[] byteArray = new byte[filesize];
 
@@ -111,14 +110,14 @@ public class Controller {
                                 {
                                     filesize = msg.getFilesize();
                                     bos.write(msg.getBytes(), 0 , filesize);
-                                    System.out.println("Wrote " + msg.getFilesize() + " in one loop of Controller receiver");
+                                    //System.out.println("Wrote " + msg.getFilesize() + " in one loop of Controller receiver");
 
                                     msg = queue.take();
                                 }
 
                                 filesize = msg.getFilesize();
                                 bos.write(msg.getBytes(), 0 , filesize);
-                                System.out.println("Wrote " + msg.getFilesize() + " in fileend of Controller receiver");
+                                //System.out.println("Wrote " + msg.getFilesize() + " in fileend of Controller receiver");
                                 
                                 bos.flush();
                                 bos.close();
@@ -134,7 +133,7 @@ public class Controller {
                                 int filesize = 1024*8;
                                 //byte[] byteArray = new byte[filesize];
                                 bos.write(msg.getBytes(), 0 , filesize);
-                                System.out.println("Wrote " + msg.getFilesize() + " in fileend of Controller receiver");
+                                //System.out.println("Wrote " + msg.getFilesize() + " in fileend of Controller receiver");
 
                                 bos.flush();
                                 bos.close();
@@ -151,7 +150,7 @@ public class Controller {
                             }
                             
                         } catch (Exception e) { 
-                            //e.printStackTrace(); 
+                            e.printStackTrace(); 
                         } 
                     } 
                 } 
@@ -159,7 +158,6 @@ public class Controller {
 
             accepter.start(); 
 
-            //readMessage.join(); 
         } catch(Exception e){
             //e.printStackTrace();
         }

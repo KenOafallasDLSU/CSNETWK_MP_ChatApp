@@ -22,8 +22,6 @@ public class Logger
 
     public void promptLogs()
     {
-        System.out.println("Print the logs?");
-
         boolean print = false;
         int result = JOptionPane.showConfirmDialog(
             null, "Print the logs?", null,
@@ -31,12 +29,12 @@ public class Logger
             JOptionPane.QUESTION_MESSAGE);
 
             if(result == JOptionPane.YES_OPTION){
-                System.out.println("Yes");
+                // System.out.println("Yes");
                 print = true;
             }else if (result == JOptionPane.NO_OPTION){
-                System.out.println("No");
+                // System.out.println("No");
             }else {
-                System.out.println("None selected");
+                // System.out.println("None selected");
         }
 
         if(print){
@@ -48,8 +46,6 @@ public class Logger
             }
 
             try{
-                //System.out.println(this.log.toString());
-
                 File logFile = new File(".\\logs\\"+fileName);
                 logFile.createNewFile();
 
@@ -64,8 +60,8 @@ public class Logger
 
     public void addLog(String s)
     {
-        System.out.println("(" + java.time.LocalDateTime.now() + ") " + s);
         this.log.append("(" + java.time.LocalDateTime.now() + ") " + s + "\r\n");
+        System.out.println("(" + java.time.LocalDateTime.now() + ") " + s);
     }
 
     public void addHistory(String s)
