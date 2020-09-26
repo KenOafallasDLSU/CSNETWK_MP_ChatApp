@@ -90,21 +90,52 @@ public class Controller {
                             // read the message sent to this client 
                             //System.out.println("Waiting for take");
                             Message msg = queue.take();
-                            System.out.println("Took:" + msg.getText());
+                            //System.out.println("Took:" + msg.getText());
 
-                            if(msg.getText().equals("FILEFILEFILE"))
+                            if(msg.getText().equals("FILEPART"))
                             {
                                 view.saveFile();
                                 model.setFile(view.getFile());
-                                
-                                String path = model.getFile().getAbsolutePath();
-                                System.out.println(path);
 
-                                int filesize = msg.getFilesize();
-                                byte[] byteArray = new byte[filesize];
+                                String path = model.getFile().getAbsolutePath();
                                 FileOutputStream fos = new FileOutputStream(path);
                                 BufferedOutputStream bos = new BufferedOutputStream(fos);
+
+                                //
+                                System.out.println(path);
+
+                                int filesize;
+                                //byte[] byteArray = new byte[filesize];
+
+                                while(msg.getText().equals("FILEPART"))
+                                {
+                                    filesize = msg.getFilesize();
+                                    bos.write(msg.getBytes(), 0 , filesize);
+                                    System.out.println("Wrote " + msg.getFilesize() + " in one loop of Controller receiver");
+
+                                    msg = queue.take();
+                                }
+
+                                filesize = msg.getFilesize();
                                 bos.write(msg.getBytes(), 0 , filesize);
+                                System.out.println("Wrote " + msg.getFilesize() + " in fileend of Controller receiver");
+                                
+                                bos.flush();
+                                bos.close();
+
+                            } else if(msg.getText().equals("FILEEND")){
+                                view.saveFile();
+                                model.setFile(view.getFile());
+
+                                String path = model.getFile().getAbsolutePath();
+                                FileOutputStream fos = new FileOutputStream(path);
+                                BufferedOutputStream bos = new BufferedOutputStream(fos);
+
+                                int filesize = 1024*8;
+                                //byte[] byteArray = new byte[filesize];
+                                bos.write(msg.getBytes(), 0 , filesize);
+                                System.out.println("Wrote " + msg.getFilesize() + " in fileend of Controller receiver");
+
                                 bos.flush();
                                 bos.close();
 

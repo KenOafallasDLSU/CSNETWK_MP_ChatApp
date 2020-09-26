@@ -7,6 +7,7 @@
 import java.lang.*;
 import java.net.*;
 import java.io.*;
+import java.nio.charset.*;
 
 public class CMDServer
 {
@@ -295,18 +296,30 @@ class CMDClientHandler implements Runnable
         try{
             //System.out.println("Getting file from sender...");
 
-            int filesize = 1048576;
+            int filesize = 1024*8;
             byte[] byteArrayR = new byte[filesize];
 
-            int bytesRead = dis.read(byteArrayR,0,byteArrayR.length);
-            
-            //System.out.println("Server: relaying file (" + bytesRead + " bytes)");        
+            int bytesRead;// = dis.read(byteArrayR,0,byteArrayR.length);
+            boolean inFile = true;
+            while (dis.readUTF().equals("FILEPART")) {
+                bytesRead = dis.read(byteArrayR,0,byteArrayR.length);
 
-            dos.write(byteArrayR, 0 , bytesRead);
+                dos.writeUTF("FILEPART");
+                dos.write(byteArrayR, 0, bytesRead);
+                dos.flush();
+                //
+                System.out.println("Read " + bytesRead + " bytes in one loop of Server.relayFile");
+            }
+            
+            //dos.write(byteArrayR, 0 , bytesRead);
+            bytesRead = dis.read(byteArrayR,0,byteArrayR.length);
+            dos.writeUTF("FILEEND");
+            dos.write(byteArrayR, 0, bytesRead);
+            System.out.println("Finished Server.relayFile with " + bytesRead);
             dos.flush();
 
         } catch(Exception e){
-            //e.printStackTrace();
+            e.printStackTrace();
             CMDServer.loggerServer.addLog("Server: Client at " + this.s.getRemoteSocketAddress() + " failed sending file.");
         }
     }

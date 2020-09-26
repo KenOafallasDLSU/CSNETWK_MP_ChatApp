@@ -54,7 +54,7 @@ public class Client
 
                             } else{
 
-                                System.out.println("Received str: " + str);
+                                //System.out.println("Received str: " + str);
                                 receiveText(str);
                                 
                             }
@@ -108,16 +108,33 @@ public class Client
             //read file
             //String fileName = f.replace("\\","\\\\");
             //File file = new File(fileName);
-            byte[] byteArray = new byte [(int)file.length()];
+            byte[] byteArray = new byte [1024*8];;
 			
 			FileInputStream fis = new FileInputStream(file);
 			BufferedInputStream bis = new BufferedInputStream(fis);
-            bis.read(byteArray,0,byteArray.length);
-			DataInputStream disReader = new DataInputStream(bis);
+            //bis.read(byteArray,0,byteArray.length);
+            //DataInputStream disReader = new DataInputStream(bis);
+            
+            
+            int count;
+            while ((count = bis.read(byteArray,0,byteArray.length)) >= 1024*8)
+            {
+                dos.writeUTF("FILEPART");
+                dos.write(byteArray, 0, count);
+                dos.flush();
+                //
+                System.out.println("Read " + count + " bytes in one count of Client.sendFile");
+            }
+            
+            //dos.writeUTF("FILEPART");
+            /*
+            int count = bis.read(byteArray,0,byteArray.length);
+            System.out.println("Read " + count + " bytes in Client.sendFile");
+            */
+            dos.writeUTF("FILEEND");
+            dos.write(byteArray, 0, count);
+            System.out.println("Read " + count + " bytes in fileend of Client.sendFile");
 
-            //send file
-            //System.out.println("Sending file " + "\"" + fileName + "\" " + "(" + byteArray.length + " bytes)\n" );  
-            dos.write(byteArray,0,byteArray.length);
             dos.flush();
 
         } catch(Exception e){
@@ -146,19 +163,34 @@ public class Client
 
             //String fileName = "C:\\Users\\dell\\Desktop\\CCS Files\\Year 2 Term 3\\CSNETWK\\project\\CSNETWK_MP_ChatApp\\leFold\\gotcha.jpg";
 
-            int filesize = 1048576;
-            byte[] byteArray = new byte[filesize];
+            int filesize = 1024*8;
+            byte[] byteArray;
 
             //FileOutputStream fos = new FileOutputStream(fileName);
             //BufferedOutputStream bos = new BufferedOutputStream(fos);
-            int bytesRead = dis.read(byteArray,0,byteArray.length);
+            int bytesRead;
+            
+            while(dis.readUTF().equals("FILEPART"))
+            {
+                byteArray = new byte[filesize];
+                bytesRead = dis.read(byteArray,0,byteArray.length);
+                System.out.println("Read " + bytesRead + " bytes in one loop of Client.receiveFile");
+
+                Message msg = new Message(bytesRead);
+                msg.setText("FILEPART");
+                msg.setBytes(byteArray);
+                this.queue.put(msg);
+            }
+
+            byteArray = new byte[filesize];
+            bytesRead = dis.read(byteArray,0,byteArray.length);
+            System.out.println("Finished Client.receiveFile with " + bytesRead);
 
             Message msg = new Message(bytesRead);
-            msg.setText("FILEFILEFILE");
+            msg.setText("FILEEND");
             msg.setBytes(byteArray);
-
             this.queue.put(msg);
-
+            
             // System.out.println("received bytes: " + bytesRead);
     
             // bos.write(byteArray, 0 , bytesRead);
