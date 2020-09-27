@@ -5,5 +5,5 @@ Machine Project for CSNETWK subject in De La Salle University. Task is to develo
 Project is created with Java, primarily using Socket and ServerSocket classes
 
 ## How to run
-1. Compile and run `CMDClient.java` to start the server
-2. Compile and run `Driver.java` to open the Client Chat GUI for each client
+1. Compile and run `CMDServer.java` to start the server in the `Server` folder
+2. Compile and run `Driver.java` to open the Client Chat GUI for each client in the `Client` folder
