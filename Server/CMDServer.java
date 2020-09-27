@@ -7,6 +7,7 @@
 import java.lang.*;
 import java.net.*;
 import java.io.*;
+import java.nio.charset.*;
 
 public class CMDServer
 {
@@ -35,7 +36,7 @@ public class CMDServer
                     do{
                         if(!CMDServer.chA.isLoggedIn)
                         { 
-                            CMDServer.loggerServer.addLog("Server: Listening on port " + nPort + " at IPAddress " + serverSocket.getInetAddress() + " for User A");
+                            CMDServer.loggerServer.addLog("Server: Listening on port " + nPort + " at IPAddress localhost/127.0.0.1 for User A");
                             Socket userA = new Socket();
                             userA = serverSocket.accept();
                             CMDServer.loggerServer.addLog("Server: Client A at " + userA.getRemoteSocketAddress() + " has connected and logged in");
@@ -65,7 +66,7 @@ public class CMDServer
                         if (!CMDServer.chB.isLoggedIn)
                         {
 
-                            CMDServer.loggerServer.addLog("Server: Listening on port " + nPort + " at IPAddress " + serverSocket.getInetAddress() + " for User B");
+                            CMDServer.loggerServer.addLog("Server: Listening on port " + nPort + " at IPAddress localhost/127.0.0.1 for User B");
                             Socket userB = new Socket();
                             userB = serverSocket.accept();
                             CMDServer.loggerServer.addLog("Server: Client B at " + userB.getRemoteSocketAddress() + " has connected and logged in");
@@ -85,7 +86,7 @@ public class CMDServer
                     }while(CMDServer.userExists);
 
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    //e.printStackTrace();
                 }
             });
 
@@ -235,7 +236,7 @@ class CMDClientHandler implements Runnable
             this.dis.close(); 
             this.dos.close(); 
         } catch(Exception e){
-            e.printStackTrace(); 
+            //e.printStackTrace(); 
         }
     }
 
@@ -244,7 +245,7 @@ class CMDClientHandler implements Runnable
         try{
             dos.writeUTF(received);
         } catch(Exception e){
-            
+            //e.printStackTrace(); 
         }
         
     }
@@ -252,15 +253,35 @@ class CMDClientHandler implements Runnable
     void relayFile(DataInputStream dis, DataOutputStream dos)
     {
         try{
-            int filesize = 1048576;
+
+            int filesize = 1024*8;
             byte[] byteArrayR = new byte[filesize];
 
-            int bytesRead = dis.read(byteArrayR,0,byteArrayR.length); 
+            int bytesRead;// = dis.read(byteArrayR,0,byteArrayR.length);
+            boolean inFile = dis.readUTF().equals("FILEPART");
 
-            dos.write(byteArrayR, 0 , bytesRead);
+            System.out.println(inFile + " init status");
+
+            while (inFile) {
+                bytesRead = dis.read(byteArrayR,0,byteArrayR.length);
+
+                dos.writeUTF("FILEPART");
+                dos.write(byteArrayR, 0, bytesRead);
+                dos.flush();
+                
+                inFile = dis.readUTF().equals("FILEPART");
+
+                //System.out.println("Next is not last: "+ inFile + ": Read " + bytesRead + " bytes in one loop of Server.relayFile");
+            }
+            
+            bytesRead = dis.read(byteArrayR,0,byteArrayR.length);
+            dos.writeUTF("FILEEND");
+            dos.write(byteArrayR, 0, bytesRead);
+            //System.out.println("Finished Server.relayFile with " + bytesRead);
             dos.flush();
 
         } catch(Exception e){
+            e.printStackTrace();
             CMDServer.loggerServer.addLog("Server: Client at " + this.s.getRemoteSocketAddress() + " failed sending file.");
         }
     }
@@ -274,7 +295,7 @@ class CMDClientHandler implements Runnable
                     CMDServer.userExists = false;
             CMDServer.loggerServer.addLog("Server: Client at " + this.s.getRemoteSocketAddress() + " has disconnected.");
         } catch(Exception e){
-            
+            //e.printStackTrace(); 
         }
         
     }

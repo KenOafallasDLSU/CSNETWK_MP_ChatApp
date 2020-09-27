@@ -193,6 +193,7 @@ public class View {
         this.logoutButton.setVisible(false);
 
         this.chatArea.setText("");
+        this.ip.setText("");
         this.message.setText("");
         this.message.setEditable(false);
         this.sendFileButton.setEnabled(false);

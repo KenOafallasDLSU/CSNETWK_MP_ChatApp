@@ -61,6 +61,7 @@ public class Logger
     public void addLog(String s)
     {
         this.log.append("(" + java.time.LocalDateTime.now() + ") " + s + "\r\n");
+        System.out.println("(" + java.time.LocalDateTime.now() + ") " + s);
     }
 
     public void addHistory(String s)

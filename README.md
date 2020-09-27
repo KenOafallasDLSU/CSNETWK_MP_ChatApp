@@ -1,5 +1,9 @@
 # CSNETWK_MP_ChatApp
 Machine Project for CSNETWK subject in De La Salle University. Task is to develop De La Salle Usap (DLSU), a one-on-one chat application. This application allows clients to send and receive messages and files. DLSU allows privacy in such a way that a conversation is shared only between two (2) clients. These conversations are handled by a messaging server.
 
-##Technologies
+## Technologies
 Project is created with Java, primarily using Socket and ServerSocket classes
+
+## How to run
+1. Compile and run `CMDClient.java` to start the server
+2. Compile and run `Driver.java` to open the Client Chat GUI for each client
